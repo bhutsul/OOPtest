@@ -275,17 +275,6 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
 
         return !empty($robots_speed) ? min($robots_speed) : 0;
     }
-
-    public function reset(array $mergeRobots): AbstractRobot
-    {
-        $mergeRobot = new MergeRobot();
-
-        foreach ($mergeRobots as $robot) {
-            $mergeRobot->addRobot($robot);
-        }
-
-        return $mergeRobot;
-    }
 }
 
 
