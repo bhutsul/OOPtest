@@ -22,6 +22,7 @@ abstract class AbstractFactory
     }
 
     /**
+     * i would like to use for first element of array object from type, but it is not logical
      * @param int $count
      * @param $className
      * @return array
@@ -37,7 +38,7 @@ abstract class AbstractFactory
         $robots = [];
 
         for ($i = 0; $i < $count; $i++) {
-            $robots[] = new $className();
+            $robots[] = clone $this->types[$className];
         }
 
         return $robots;
@@ -93,40 +94,76 @@ class FactoryRobot extends AbstractFactory
 
 abstract class AbstractRobot
 {
-    abstract function getWeight();
-    abstract function getHeight();
-    abstract function getSpeed();
+    protected $weight;
+    protected $height;
+    protected $speed;
+
+    /**
+     * @param mixed $weight
+     */
+    public function setWeight($weight): void
+    {
+        $this->weight = $weight;
+    }
+
+    /**
+     * @param mixed $height
+     */
+    public function setHeight($height): void
+    {
+        $this->height = $height;
+    }
+
+    /**
+     * @param mixed $speed
+     */
+    public function setSpeed($speed): void
+    {
+        $this->speed = $speed;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHeight()
+    {
+        return $this->height;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSpeed()
+    {
+        return $this->speed;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWeight()
+    {
+        return $this->weight;
+    }
 }
 
 class Robot1 extends AbstractRobot
 {
-    public function getHeight()
+    public function __construct()
     {
-        // TODO: Implement getHeight() method.
-    }
-    public function getWeight()
-    {
-        // TODO: Implement getWeight() method.
-    }
-    public function getSpeed()
-    {
-        // TODO: Implement getSpeed() method.
+        $this->setSpeed(1);
+        $this->setWeight(1);
+        $this->setHeight(1);
     }
 }
 
 class Robot2 extends AbstractRobot
 {
-    public function getHeight()
+    public function __construct()
     {
-        // TODO: Implement getHeight() method.
-    }
-    public function getWeight()
-    {
-        // TODO: Implement getWeight() method.
-    }
-    public function getSpeed()
-    {
-        // TODO: Implement getSpeed() method.
+        $this->setSpeed(2);
+        $this->setWeight(1);
+        $this->setHeight(1);
     }
 }
 
@@ -134,26 +171,65 @@ interface MergeRobotInterface
 {
     public function addRobot($robot);
     public function getRobots(): array;
+    public function speedCalculate(): int;
 }
 
 class MergeRobot extends AbstractRobot implements MergeRobotInterface
 {
     private $robots = [];
 
-    public function getHeight()
+    /**
+     * @param int $height
+     */
+    public function setHeight($height = 0): void
     {
-        // TODO: Implement getHeight() method.
-    }
-    public function getWeight()
-    {
-        // TODO: Implement getWeight() method.
-    }
-    public function getSpeed()
-    {
-        // TODO: Implement getSpeed() method.
+        foreach ($this->robots as $robot) {
+            $height += $robot->getHeight();
+        }
+
+        $this->height = $height;
     }
 
-    //mixed types if php 8 AbstractRobot|array
+    /**
+     * @param int $speed
+     */
+    public function setSpeed($speed): void
+    {
+        $this->speed = $speed;
+    }
+
+    /**
+     * @param int $weight
+     */
+    public function setWeight($weight = 0): void
+    {
+        foreach ($this->robots as $robot) {
+            $weight += $robot->getWeight();
+        }
+
+        $this->weight = $weight;
+    }
+
+    public function getHeight()
+    {
+        return $this->height;
+    }
+
+    public function getWeight()
+    {
+        return $this->weight;
+    }
+
+    public function getSpeed()
+    {
+        return $this->speed;
+    }
+
+    /**
+     * mixed types if php 8 AbstractRobot|array
+     * @param $robots
+     * @return $this
+     */
     public function addRobot($robots)
     {
         if ($robots instanceof AbstractRobot) {
@@ -166,7 +242,19 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
             }
         }
 
+        $this->setSpeed($this->speedCalculate());
+        $this->setHeight();
+        $this->setWeight();
+
         return $this;
+    }
+
+    /**
+     * @param array $robots
+     */
+    public function setRobots(array $robots): void
+    {
+        $this->robots = $robots;
     }
 
     /**
@@ -176,23 +264,60 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
     {
         return $this->robots;
     }
+
+    public function speedCalculate(): int
+    {
+        $robots_speed = [];
+
+        foreach ($this->robots as $robot) {
+            $robots_speed[] = $robot->getSpeed();
+        }
+
+        return !empty($robots_speed) ? min($robots_speed) : 0;
+    }
+
+    public function reset(array $mergeRobots): AbstractRobot
+    {
+        $mergeRobot = new MergeRobot();
+
+        foreach ($mergeRobots as $robot) {
+            $mergeRobot->addRobot($robot);
+        }
+
+        return $mergeRobot;
+    }
 }
 
-//function reset(array $mergeRobots)
-//{
-//
-//}
+
+
+function resett(array $mergeRobots): AbstractRobot
+{
+    $mergeRobot = new MergeRobot();
+
+    foreach ($mergeRobots as $robot) {
+        $mergeRobot->addRobot($robot);
+    }
+
+    return $mergeRobot;
+}
+
+
 
 $factory = new FactoryRobot();
 
 $factory->addType(new Robot1());
 $factory->addType(new Robot2());
 
-var_dump($factory->createRobot1(5));
-var_dump($factory->createRobot2(2));
+//var_dump($factory->createRobot1(5));
+//var_dump($factory->createRobot2(2));
 
 $mergeRobot = new MergeRobot();
 $mergeRobot->addRobot(new Robot2());
 $mergeRobot->addRobot($factory->createRobot2(2));
+$factory->addType($mergeRobot);
 
-var_dump($mergeRobot);
+$res = resett($factory->createMergeRobot(2));
+
+echo $res->getSpeed();
+
+echo $res->getWeight();
