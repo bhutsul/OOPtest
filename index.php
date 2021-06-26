@@ -252,14 +252,7 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
 function resett(array $mergeRobots): AbstractRobot
 {
     $mergeRobot = new MergeRobot();
-
-    foreach ($mergeRobots as $robot) {
-        if (!$robot instanceof AbstractRobot) {
-            throw new Exception('Robot must be instance of AbstractRobot');
-        }
-
-        $mergeRobot->addRobot($robot);
-    }
+    $mergeRobot->addRobot($mergeRobots);
 
     return $mergeRobot;
 }
