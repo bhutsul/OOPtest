@@ -219,17 +219,19 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
     {
         if ($robots instanceof AbstractRobot) {
             $this->robots[] = $robots;
+            $this->weight += $robots->getWeight();
+            $this->height += $robots->getHeight();
         }
 
         if (is_array($robots)) {
             foreach ($robots as $robot) {
                 $this->robots[] = $robot;
             }
+            $this->setHeight();
+            $this->setWeight();
         }
 
         $this->setSpeed($this->speedCalculate());
-        $this->setHeight();
-        $this->setWeight();
 
         return $this;
     }
