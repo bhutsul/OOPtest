@@ -178,57 +178,36 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
 {
     private $robots = [];
 
-    /**
-     * @param int $height
-     */
-    public function setHeight($height = 0): void
-    {
-        foreach ($this->robots as $robot) {
-            $height += $robot->getHeight();
-        }
 
-        $this->height = $height;
-    }
-
-    /**
-     * @param int $speed
-     */
-    public function setSpeed($speed): void
-    {
-        $this->speed = $speed;
-    }
-
-    /**
-     * @param int $weight
-     */
-    public function setWeight($weight = 0): void
-    {
-        foreach ($this->robots as $robot) {
-            $weight += $robot->getWeight();
-        }
-
-        $this->weight = $weight;
-    }
-    
     /**
      * mixed types if php 8 AbstractRobot|array
      * @param $robots
      * @return $this
+     * @throws Exception
      */
     public function addRobot($robots)
     {
         if ($robots instanceof AbstractRobot) {
             $this->robots[] = $robots;
-            $this->weight += $robots->getWeight();
-            $this->height += $robots->getHeight();
-        }
 
-        if (is_array($robots)) {
+            $height = $this->height += $robots->getHeight();
+            $weight = $this->weight += $robots->getWeight();
+
+            $this->setHeight($height);
+            $this->setWeight($weight);
+        } else if (is_array($robots)) {
             foreach ($robots as $robot) {
+                if (!$robot instanceof AbstractRobot) {
+                    throw new Exception('Robot must be instance of AbstractRobot');
+                }
+
                 $this->robots[] = $robot;
             }
-            $this->setHeight();
-            $this->setWeight();
+
+            $this->setHeight($this->heightCalculate());
+            $this->setWeight($this->weightCalculate());
+        } else {
+            throw new Exception('Robots must be instance of AbstractRobot or array');
         }
 
         $this->setSpeed($this->speedCalculate());
@@ -262,6 +241,28 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
 
         return !empty($robots_speed) ? min($robots_speed) : 0;
     }
+
+    public function heightCalculate(): int
+    {
+        $height = 0;
+
+        foreach ($this->robots as $robot) {
+            $height += $robot->getHeight();
+        }
+
+        return $height;
+    }
+
+    public function weightCalculate(): int
+    {
+        $weight = 0;
+
+        foreach ($this->robots as $robot) {
+            $weight += $robot->getWeight();
+        }
+
+        return $weight;
+    }
 }
 
 
@@ -271,6 +272,10 @@ function resett(array $mergeRobots): AbstractRobot
     $mergeRobot = new MergeRobot();
 
     foreach ($mergeRobots as $robot) {
+        if (!$robot instanceof AbstractRobot) {
+            throw new Exception('Robot must be instance of AbstractRobot');
+        }
+
         $mergeRobot->addRobot($robot);
     }
 
