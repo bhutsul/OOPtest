@@ -24,13 +24,14 @@ abstract class AbstractFactory
     /**
      * @param int $count
      * @param $className
-     * @return array|string
+     * @return array
+     * @throws Exception
      */
-    protected function createRobots(int $count, $className)
+    protected function createRobots(int $count, $className): array
     {
         if (!$this->validateType($className)) {
-            return "you need to add a robot $className type";
-//            throw new Exception("$className does not exist");
+//            return "you need to add a robot $className type";
+            throw new Exception("$className does not exist");
         }
 
         $robots = [];
@@ -42,22 +43,23 @@ abstract class AbstractFactory
         return $robots;
     }
 
-    //if php version 8 i could use :array|string
-    abstract public function createRobot1(int $count);
-    abstract public function createRobot2(int $count);
-    abstract public function createMergeRobot(int $count);
+    abstract public function createRobot1(int $count): array;
+    abstract public function createRobot2(int $count): array;
+    abstract public function createMergeRobot(int $count): array;
 }
 
-//i did a validation type, but i do not know if type is required
+//i did a validation type, but i do not know if type is required, if it is not required i would just create instance
+//i would like to send exception but i do not know about client, i think exception is better
 
 class FactoryRobot extends AbstractFactory
 {
 
     /**
      * @param int $count
-     * @return array|string
+     * @return array
+     * @throws Exception
      */
-    public function createRobot1(int $count)
+    public function createRobot1(int $count): array
     {
         $className = 'Robot1';
 
@@ -66,9 +68,10 @@ class FactoryRobot extends AbstractFactory
 
     /**
      * @param int $count
-     * @return array|string
+     * @return array
+     * @throws Exception
      */
-    public function createRobot2(int $count)
+    public function createRobot2(int $count): array
     {
         $className = 'Robot2';
 
@@ -77,9 +80,10 @@ class FactoryRobot extends AbstractFactory
 
     /**
      * @param int $count
-     * @return array|string
+     * @return array
+     * @throws Exception
      */
-    public function createMergeRobot(int $count)
+    public function createMergeRobot(int $count): array
     {
         $className = 'MergeRobot';
 
@@ -128,7 +132,7 @@ class Robot2 extends AbstractRobot
 
 interface MergeRobotInterface
 {
-    public function addRobot($robot): void;
+    public function addRobot($robot);
     public function getRobots(): array;
 }
 
@@ -150,7 +154,7 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
     }
 
     //mixed types if php 8 AbstractRobot|array
-    public function addRobot($robots): void
+    public function addRobot($robots)
     {
         if ($robots instanceof AbstractRobot) {
             $this->robots[] = $robots;
@@ -161,6 +165,8 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
                 $this->robots[] = $robot;
             }
         }
+
+        return $this;
     }
 
     /**
@@ -172,10 +178,10 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
     }
 }
 
-function reset(array $mergeRobots)
-{
-
-}
+//function reset(array $mergeRobots)
+//{
+//
+//}
 
 $factory = new FactoryRobot();
 
@@ -188,3 +194,5 @@ var_dump($factory->createRobot2(2));
 $mergeRobot = new MergeRobot();
 $mergeRobot->addRobot(new Robot2());
 $mergeRobot->addRobot($factory->createRobot2(2));
+
+var_dump($mergeRobot);
