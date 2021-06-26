@@ -170,7 +170,6 @@ class Robot2 extends AbstractRobot
 interface MergeRobotInterface
 {
     public function addRobot($robot);
-    public function getRobots(): array;
     public function speedCalculate(): int;
     public function heightCalculate(): int;
     public function weightCalculate(): int;
@@ -179,7 +178,6 @@ interface MergeRobotInterface
 class MergeRobot extends AbstractRobot implements MergeRobotInterface
 {
     private $robots = [];
-
 
     /**
      * mixed types if php 8 AbstractRobot|array
@@ -217,22 +215,6 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
         return $this;
     }
 
-    /**
-     * @param array $robots
-     */
-    public function setRobots(array $robots): void
-    {
-        $this->robots = $robots;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRobots(): array
-    {
-        return $this->robots;
-    }
-
     public function speedCalculate(): int
     {
         $robots_speed = [];
@@ -266,8 +248,6 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
         return $weight;
     }
 }
-
-
 
 function resett(array $mergeRobots): AbstractRobot
 {
