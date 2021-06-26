@@ -172,6 +172,8 @@ interface MergeRobotInterface
     public function addRobot($robot);
     public function getRobots(): array;
     public function speedCalculate(): int;
+    public function heightCalculate(): int;
+    public function weightCalculate(): int;
 }
 
 class MergeRobot extends AbstractRobot implements MergeRobotInterface
