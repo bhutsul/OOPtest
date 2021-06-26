@@ -209,22 +209,7 @@ class MergeRobot extends AbstractRobot implements MergeRobotInterface
 
         $this->weight = $weight;
     }
-
-    public function getHeight()
-    {
-        return $this->height;
-    }
-
-    public function getWeight()
-    {
-        return $this->weight;
-    }
-
-    public function getSpeed()
-    {
-        return $this->speed;
-    }
-
+    
     /**
      * mixed types if php 8 AbstractRobot|array
      * @param $robots
